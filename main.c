@@ -12,13 +12,13 @@ void main(const int argc, const char* argv[]) {
   
   FILE* file_in = fopen(argv[1], "rb");
   if (!file_in) {
-    perror("parser");
+    perror("hyperlisp");
     exit(1);
   }
   
   FILE* file_out = fopen(argv[2], "wb");
   if (!file_out) {
-    perror("parser");
+    perror("hyperlisp");
     exit(1);
   }
   
