@@ -6,7 +6,7 @@
 
 void main(const int argc, const char* argv[]) {
   if (argc != 3) {
-    puts("usage: parser <file>");
+    puts("usage: hyperlisp <input> <output>");
     exit(1);
   }
   
