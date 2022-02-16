@@ -51,4 +51,12 @@ void main(const int argc, const char* argv[]) {
   parse(&prss);
   
   fclose(file_out);
+  
+  for (long i = 0; i < lexs.tokens_amount; i++) {
+    if (lexs.tokens[i].data) {
+      free(lexs.tokens[i].data);
+    }
+  }
+  
+  free(lexs.tokens);
 }
