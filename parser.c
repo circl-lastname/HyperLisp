@@ -64,25 +64,29 @@ static void recurse(prsstate* s) {
   
   fprintf(s->file, ">");
   
-  while (s->tk->type != END_BLOCK) {
-    switch (s->tk->type) {
-      case BEGIN_BLOCK:
-        recurse(s);
-      break;
-      case STRING:
-      case LITERAL:
-        fputs(s->tk->data, s->file);
-      break;
-      default:
-        error(s, "Expected BEGIN_BLOCK, STRING or LITERAL");
-      break;
+  if (needs_closing(element)) {
+    while (s->tk->type != END_BLOCK) {
+      switch (s->tk->type) {
+        case BEGIN_BLOCK:
+          recurse(s);
+        break;
+        case STRING:
+        case LITERAL:
+          fputs(s->tk->data, s->file);
+        break;
+        default:
+          error(s, "Expected BEGIN_BLOCK, STRING or LITERAL");
+        break;
+      }
+      
+      consume(s);
     }
     
-    consume(s);
-  }
-  
-  if (needs_closing(element)) {
     fprintf(s->file, "</%s>", element);
+  } else {
+    if (s->tk->type != END_BLOCK) {
+      error(s, "Expected END_BLOCK");
+    }
   }
 }
 
