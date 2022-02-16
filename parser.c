@@ -46,12 +46,12 @@ static void recurse(prsstate* s) {
     error(s, "A tag must be a symbol");
   }
   
-  fprintf(s->file, "<%s ", s->tk->data);
+  fprintf(s->file, "<%s", s->tk->data);
   char* element = s->tk->data;
   consume(s);
   
   while (s->tk->type == KEYWORD) {
-    fprintf(s->file, "%s", s->tk->data);
+    fprintf(s->file, " %s", s->tk->data);
     consume(s);
     
     if (!(s->tk->type == STRING || s->tk->type == LITERAL)) {
@@ -59,9 +59,7 @@ static void recurse(prsstate* s) {
     }
     
     if (s->tk->data[0] != '\0') {
-      fprintf(s->file, "=\"%s\" ", s->tk->data);
-    } else {
-      fprintf(s->file, " ");
+      fprintf(s->file, "=\"%s\"", s->tk->data);
     }
     
     consume(s);
