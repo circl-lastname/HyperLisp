@@ -43,7 +43,7 @@ static void recurse(prsstate* s) {
   consume(s);
   
   if (s->tk->type != SYMBOL) {
-    error(s, "Expected SYMBOL");
+    error(s, "A tag must be a symbol");
   }
   
   fprintf(s->file, "<%s ", s->tk->data);
@@ -55,7 +55,7 @@ static void recurse(prsstate* s) {
     consume(s);
     
     if (!(s->tk->type == STRING || s->tk->type == LITERAL)) {
-      error(s, "Expected SYMBOL or LITERAL");
+      error(s, "An attribute must be a string or literal");
     }
   
     fprintf(s->file, "\"%s\" ", s->tk->data);
@@ -75,7 +75,7 @@ static void recurse(prsstate* s) {
           fputs(s->tk->data, s->file);
         break;
         default:
-          error(s, "Expected BEGIN_BLOCK, STRING or LITERAL");
+          error(s, "Content must be other elements, strings or literals");
         break;
       }
       
@@ -85,7 +85,7 @@ static void recurse(prsstate* s) {
     fprintf(s->file, "</%s>", element);
   } else {
     if (s->tk->type != END_BLOCK) {
-      error(s, "Expected END_BLOCK");
+      error(s, "Content is not allowed in void elements");
     }
   }
 }
