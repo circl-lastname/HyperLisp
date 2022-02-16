@@ -51,14 +51,19 @@ static void recurse(prsstate* s) {
   consume(s);
   
   while (s->tk->type == KEYWORD) {
-    fprintf(s->file, "%s=", s->tk->data);
+    fprintf(s->file, "%s", s->tk->data);
     consume(s);
     
     if (!(s->tk->type == STRING || s->tk->type == LITERAL)) {
       error(s, "An attribute must be a string or literal");
     }
-  
-    fprintf(s->file, "\"%s\" ", s->tk->data);
+    
+    if (s->tk->data[0] != '\0') {
+      fprintf(s->file, "=\"%s\" ", s->tk->data);
+    } else {
+      fprintf(s->file, " ");
+    }
+    
     consume(s);
   }
   
