@@ -267,10 +267,10 @@ static void recurse(lexstate* s, char endch, lextype endtype) {
         char* string = get_string(s);
         put_token(s, STRING, string);
       break;
-      default:
+      default: { // some compilers (eg clang, older gcc) don't like having variables in default
         char* symbol = get_until_disallowed(s, endch);
         put_token(s, SYMBOL, symbol);
-      break;
+      } break;
     }
   }
   
