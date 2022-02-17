@@ -6,10 +6,10 @@ The Lisp-to-HTML preprocessor
 Add this to your README to show off:
 
 ```
-[![built with HyperLisp!](https://img.shields.io/badge/built%20with-HyperLisp!-brightgreen)](https://github.com/circl-lastname/HyperLisp)
+[![built with HyperLisp!](https://img.shields.io/badge/built%20with-HyperLisp!-blue)](https://github.com/circl-lastname/HyperLisp)
 ```
 
-[![built with HyperLisp!](https://img.shields.io/badge/built%20with-HyperLisp!-brightgreen)](https://github.com/circl-lastname/HyperLisp)
+[![built with HyperLisp!](https://img.shields.io/badge/built%20with-HyperLisp!-blue)](https://github.com/circl-lastname/HyperLisp)
 
 ## Quick start guide
 ```lisp
