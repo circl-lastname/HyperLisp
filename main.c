@@ -45,6 +45,7 @@ void main(const int argc, const char* argv[]) {
   prss.filename_in = argv[1];
   prss.tk = &lexs.tokens[0];
   prss.current_token = 0;
+  prss.put_doctype = 0;
   prss.tokens_amount = lexs.tokens_amount;
   prss.tokens = lexs.tokens;
   

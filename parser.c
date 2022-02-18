@@ -46,6 +46,21 @@ static void recurse(prsstate* s) {
     error(s, "A tag must be a symbol");
   }
   
+  if (!strcmp(s->tk->data, "!nodoctype")) {
+    if (!s->put_doctype) {
+      s->put_doctype = 1;
+      consume(s);
+      return;
+    } else {
+      error(s, "A !nodoctype must be in the beggining of the file and cannot be called twice");
+    }
+  }
+  
+  if (!s->put_doctype) {
+    fputs("<!doctype html>", s->file);
+    s->put_doctype = 1;
+  }
+  
   fprintf(s->file, "<%s", s->tk->data);
   char* element = s->tk->data;
   consume(s);
@@ -94,8 +109,6 @@ static void recurse(prsstate* s) {
 }
 
 void parse(prsstate* s) {  
-  fputs("<!doctype html>", s->file);
-  
   while (s->tk->type != END_TOKENS) {
     recurse(s);
     consume(s);

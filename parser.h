@@ -6,6 +6,8 @@ typedef struct {
   lextoken* tk;
   long current_token;
   
+  int put_doctype;
+  
   long tokens_amount;
   lextoken* tokens;
 } prsstate;
