@@ -96,5 +96,8 @@ static void recurse(prsstate* s) {
 void parse(prsstate* s) {  
   fputs("<!doctype html>", s->file);
   
-  recurse(s);
+  while (s->tk->type != END_TOKENS) {
+    recurse(s);
+    consume(s);
+  }
 }
