@@ -13,18 +13,18 @@ Add this to your README to show off:
 
 ## Quick start guide
 ```lisp
-; No DOCTYPE
-; Everything needs to be in the html element
+; A DOCTYPE is inserted autmatically, but if you don't want it you can use
+(!nodoctype)
+
 (html
   ; Elements are like functions in Lisp
   (p "I am a paragraph!")
   
-  ; You can add attributes with keywords, everything after them is the content of the element
-  (img :src "verycoolimage.png")
+  ; You can add attributes with keywords and strings or literals with a single quote, everything after them is the content of the element
+  (a :href "https://example.com" :target '_blank "Very cool link!")
   
   ; Elements can be nested as ususal
-  ; Attributes can be either strings or literals with the single quote
-  (p (a :href "https://example.com" :target '_blank "Very cool link!")))
+  (p (img :src "verycoolimage.png")))
 ```
 
 ## Practical example
