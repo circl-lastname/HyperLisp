@@ -55,6 +55,9 @@ static void skip_until_newline(lexstate* s) {
           goto break_loop;
         }
       break;
+      case EOF:
+        goto break_loop;
+      break;
     }
   }
   break_loop:
