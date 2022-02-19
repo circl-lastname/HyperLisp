@@ -1,6 +1,8 @@
 # HyperLisp!
 The Lisp-to-HTML preprocessor
 
+[Try it out online!](https://circl-lastname.github.io/HyperLisp-demo)
+
 `usage: hyperlisp <input> <output>`
 
 Add this to your README to show off:
