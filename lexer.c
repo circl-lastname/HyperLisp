@@ -117,7 +117,7 @@ static void error(lexstate* s, const char* string) {
   
   char* char_arrow = malloc(s->curchar+2);
   
-  for (int i = 0; i <= s->curchar; i++) {
+  for (int i = 0; i < s->curchar; i++) {
     char_arrow[i] = ' ';
   }
   char_arrow[s->curchar] = '^';
