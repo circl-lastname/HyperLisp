@@ -20,8 +20,8 @@ typedef struct {
   lextype type;
   char* data;
   
-  int curline;
-  int curchar;
+  long curline;
+  long curchar;
 } lextoken;
 
 typedef struct {
@@ -31,8 +31,8 @@ typedef struct {
   char ch;
   int after_newline;
   
-  int curline;
-  int curchar;
+  long curline;
+  long curchar;
   int counter_disabled;
   
   long tokens_amount;
