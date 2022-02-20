@@ -2,7 +2,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "error.h"
 #include "lexer.h"
+
+static void error(lexstate* s, const char* string) {
+  print_error_and_exit(s->file, s->filename, s->curline, s->curchar, string);
+}
 
 static void put_token(lexstate* s, lextype type, char* data) {
   lextoken* token = &s->tokens[s->tokens_amount];
@@ -49,6 +54,12 @@ static void consume(lexstate* s) {
   }
 }
 
+static void skip_space(lexstate* s) {
+  while (isspace(s->ch)) {
+    consume(s);
+  }
+}
+
 static void skip_until_newline(lexstate* s) {
   while (1) {
     switch (s->ch) {
@@ -71,78 +82,6 @@ static void skip_until_newline(lexstate* s) {
   break_loop:
   
   consume(s);
-}
-
-static char* get_until_newline(lexstate* s) {
-  char* string = malloc(256);
-  size_t string_size = 256;
-  
-  size_t i = 0;
-  while (1) {
-    switch (s->ch) {
-      case '\n':
-        goto break_loop;
-      break;
-      case '\r':
-        consume(s);
-        if (s->ch == '\n') {
-          goto break_loop;
-        }
-      break;
-      case EOF:
-        goto break_loop;
-      break;
-    }
-    
-    string[i] = s->ch;
-    i++;
-    consume(s);
-    
-    if (i >= string_size) {
-      string_size *= 2;
-      string = realloc(string, string_size);
-    }
-  }
-  break_loop:
-  
-  string[i] = '\0';
-  
-  return string;
-}
-
-static void error(lexstate* s, const char* string) {
-  s->counter_disabled = 1;
-  
-  rewind(s->file);
-  consume(s);
-  
-  for (int i = 0; i < s->curline; i++) {
-    skip_until_newline(s);
-  }
-  
-  char* line = get_until_newline(s);
-  fprintf(stderr, "%s\n", line);
-  free(line);
-  
-  char* char_arrow = malloc(s->curchar+2);
-  
-  for (int i = 0; i < s->curchar; i++) {
-    char_arrow[i] = ' ';
-  }
-  char_arrow[s->curchar] = '^';
-  char_arrow[s->curchar+1] = '\0';
-  
-  fprintf(stderr, "%s\n", char_arrow);
-  free(char_arrow);
-  
-  fprintf(stderr, "%s:%i:%i  %s\n", s->filename, s->curline+1, s->curchar+1, string);
-  exit(1);
-}
-
-static void skip_space(lexstate* s) {
-  while (isspace(s->ch)) {
-    consume(s);
-  }
 }
 
 static char* get_until_disallowed(lexstate* s, char endch) {
