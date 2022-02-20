@@ -30,7 +30,7 @@ void main(const int argc, const char* argv[]) {
   lexs.after_newline = 0;
   lexs.curline = 0;
   lexs.curchar = 0;
-  lexs.in_error = 0;
+  lexs.counter_disabled = 0;
   lexs.tokens_amount = 0;
   lexs.tokens_size = 256;
   lexs.tokens = malloc(256*sizeof(lextoken));

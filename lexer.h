@@ -33,7 +33,7 @@ typedef struct {
   
   int curline;
   int curchar;
-  int in_error;
+  int counter_disabled;
   
   long tokens_amount;
   size_t tokens_size;

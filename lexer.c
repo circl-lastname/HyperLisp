@@ -27,24 +27,30 @@ static void consume(lexstate* s) {
   // - it can't run during printing an error
   // - it needs to mark the next character after a newline for reset
   // - it can't update on an EOF, since it can result in unhelpful errors
-  if (!s->in_error && s->ch != EOF) {
+  if (!s->counter_disabled) {
     if (s->after_newline) {
-      s->after_newline = 0;
-      s->curline++;
-      s->curchar = 0;
+      if (s->ch != EOF) {
+        s->after_newline = 0;
+        s->curline++;
+        s->curchar = 0;
+      }
     } else {
       s->curchar++;
-      if (s->ch == '\n') {
+    }
+    
+    switch (s->ch) {
+      case '\n':
         s->after_newline = 1;
-      }
+      break;
+      case EOF:
+        s->counter_disabled = 1;
+      break;
     }
   }
 }
 
 static void skip_until_newline(lexstate* s) {
   while (1) {
-    consume(s);
-    
     switch (s->ch) {
       case '\n':
         goto break_loop;
@@ -59,6 +65,8 @@ static void skip_until_newline(lexstate* s) {
         goto break_loop;
       break;
     }
+    
+    consume(s);
   }
   break_loop:
   
@@ -103,10 +111,11 @@ static char* get_until_newline(lexstate* s) {
 }
 
 static void error(lexstate* s, const char* string) {
-  s->in_error = 1;
+  s->counter_disabled = 1;
   
   rewind(s->file);
   consume(s);
+  
   for (int i = 0; i < s->curline; i++) {
     skip_until_newline(s);
   }
