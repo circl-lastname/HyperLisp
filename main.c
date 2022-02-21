@@ -30,6 +30,8 @@ void main(const int argc, const char* argv[]) {
   lexs.after_newline = 0;
   lexs.curline = 0;
   lexs.curchar = 0;
+  lexs.token_curline = 0;
+  lexs.token_curchar = 0;
   lexs.counter_disabled = 0;
   lexs.tokens_amount = 0;
   lexs.tokens_size = 256;

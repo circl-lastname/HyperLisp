@@ -9,13 +9,18 @@ static void error(lexstate* s, const char* string) {
   print_error_and_exit(s->file, s->filename, s->curline, s->curchar, string);
 }
 
+static void set_token_cur(lexstate* s) {
+  s->token_curline = s->curline;
+  s->token_curchar = s->curchar;
+}
+
 static void put_token(lexstate* s, lextype type, char* data) {
   lextoken* token = &s->tokens[s->tokens_amount];
   
   token->type = type;
   token->data = data;
-  token->curline = s->curline;
-  token->curchar = s->curchar;
+  token->curline = s->token_curline;
+  token->curchar = s->token_curchar;
   
   s->tokens_amount++;
   
@@ -183,6 +188,7 @@ static void recurse(lexstate* s, char endch, lextype endtype) {
         skip_until_newline(s);
       break;
       case '(':
+        set_token_cur(s);
         put_token(s, BEGIN_BLOCK, NULL);
         consume(s);
         
@@ -192,39 +198,46 @@ static void recurse(lexstate* s, char endch, lextype endtype) {
         consume(s);
         
         if (s->ch == '(') {
+          set_token_cur(s);
           put_token(s, BEGIN_LIST, NULL);
           consume(s);
           recurse(s, ')', END_LIST);
         } else {
+          set_token_cur(s);
           char* literal = get_until_disallowed(s, endch);
           put_token(s, LITERAL, literal);
         }
       break;
       case '[':
+        set_token_cur(s);
         put_token(s, BEGIN_VECTOR, NULL);
         consume(s);
         
         recurse(s, ']', END_VECTOR);
       break;
       case ':':
+        set_token_cur(s);
         consume(s);
         
         char* keyword = get_until_disallowed(s, endch);
         put_token(s, KEYWORD, keyword);
       break;
       case '"':
+        set_token_cur(s);
         consume(s);
         
         char* string = get_string(s);
         put_token(s, STRING, string);
       break;
       default: { // some compilers (eg clang, older gcc) don't like having variables in default
+        set_token_cur(s);
         char* symbol = get_until_disallowed(s, endch);
         put_token(s, SYMBOL, symbol);
       } break;
     }
   }
   
+  set_token_cur(s);
   put_token(s, endtype, NULL);
 }
 
@@ -237,6 +250,7 @@ void lex(lexstate* s) {
         skip_until_newline(s);
       break;
       case '(':
+        set_token_cur(s);
         put_token(s, BEGIN_BLOCK, NULL);
         consume(s);
         
@@ -252,5 +266,6 @@ void lex(lexstate* s) {
   }
   break_loop:
   
+  set_token_cur(s);
   put_token(s, END_TOKENS, NULL);
 }

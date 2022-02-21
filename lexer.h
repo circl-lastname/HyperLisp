@@ -33,6 +33,8 @@ typedef struct {
   
   long curline;
   long curchar;
+  long token_curline;
+  long token_curchar;
   int counter_disabled;
   
   long tokens_amount;
