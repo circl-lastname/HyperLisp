@@ -63,6 +63,6 @@ void print_error_and_exit(FILE* file, const char* filename, long curline, long c
   fprintf(stderr, "%s\n", char_arrow);
   free(char_arrow);
   
-  fprintf(stderr, "%s:%i:%i  %s\n", filename, curline+1, curchar+1, string);
+  fprintf(stderr, "%s:%li:%li  %s\n", filename, curline+1, curchar+1, string);
   exit(1);
 }
