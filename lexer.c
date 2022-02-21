@@ -242,6 +242,15 @@ static void recurse(lexstate* s, char endch, lextype endtype) {
 }
 
 void lex(lexstate* s) {
+  switch (s->ch) {
+    case '\n':
+      s->after_newline = 1;
+    break;
+    case EOF:
+      s->counter_disabled = 1;
+    break;
+  }
+  
   while (1) {
     skip_space(s);
     
