@@ -2,12 +2,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "error.h"
 #include "lexer.h"
 #include "parser.h"
 
 static void error(prsstate* s, const char* string) {
-  fprintf(stderr, "%s:%i:%i  %s\n", s->filename_in, s->tk->curline+1, s->tk->curchar+1, string);
-  exit(1);
+  print_error_and_exit(s->file_in, s->filename_in, s->tk->curline, s->tk->curchar, string);
 }
 
 static void consume(prsstate* s) {

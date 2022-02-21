@@ -1,6 +1,7 @@
 typedef struct {
   FILE* file;
   
+  FILE* file_in;
   const char* filename_in;
   
   lextoken* tk;

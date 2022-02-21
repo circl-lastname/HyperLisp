@@ -37,11 +37,10 @@ void main(const int argc, const char* argv[]) {
   
   lex(&lexs);
   
-  fclose(file_in);
-  
   prsstate prss;
   
   prss.file = file_out;
+  prss.file_in = file_in;
   prss.filename_in = argv[1];
   prss.tk = &lexs.tokens[0];
   prss.current_token = 0;
@@ -51,6 +50,7 @@ void main(const int argc, const char* argv[]) {
   
   parse(&prss);
   
+  fclose(file_in);
   fclose(file_out);
   
   for (long i = 0; i < lexs.tokens_amount; i++) {
