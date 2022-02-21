@@ -1,9 +1,9 @@
 # HyperLisp!
 The Lisp-to-HTML preprocessor
 
-[Try it out online!](https://circl-lastname.github.io/HyperLisp-demo)
-
 `usage: hyperlisp <input> <output>`
+
+[Try it out online!](https://circl-lastname.github.io/HyperLisp-demo)
 
 Add this to your README to show off:
 
@@ -53,6 +53,5 @@ Add this to your README to show off:
 ```
 
 ## Known bugs and caveats
-* If your input has an error, the error message may point you to the wrong character.
 * You still have to escape `<` and `>` like in HTML.
 * You always need to give content to attributes, even if they don't need it, empty strings work the same.
