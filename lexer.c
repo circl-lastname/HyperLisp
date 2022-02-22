@@ -179,6 +179,8 @@ static void recurse(lexstate* s, char endch, lextype endtype) {
     skip_space(s);
     
     if (s->ch == endch) {
+      set_token_cur(s);
+      put_token(s, endtype, NULL);
       consume(s);
       break;
     }
@@ -236,9 +238,6 @@ static void recurse(lexstate* s, char endch, lextype endtype) {
       } break;
     }
   }
-  
-  set_token_cur(s);
-  put_token(s, endtype, NULL);
 }
 
 void lex(lexstate* s) {
