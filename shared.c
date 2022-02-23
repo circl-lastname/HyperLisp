@@ -1,6 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+void* try(void* input) {
+  if (input == NULL) {
+    perror("hyperlisp");
+    exit(1);
+  } else {
+    return input;
+  }
+}
+
 // this is is a mini-lexer, ripping out some code from it to iterate over the file
 // there may be a more libc-this way to do this
 void print_error_and_exit(FILE* file, const char* filename, long curline, long curchar, const char* string) {
@@ -53,7 +62,7 @@ void print_error_and_exit(FILE* file, const char* filename, long curline, long c
   break_loop_2:
   fputc('\n', stderr);
   
-  char* char_arrow = malloc(curchar+2);
+  char* char_arrow = try(malloc(curchar+2));
   
   for (int i = 0; i < curchar; i++) {
     char_arrow[i] = ' ';

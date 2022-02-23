@@ -26,7 +26,7 @@ static void put_token(lexstate* s, lextype type, char* data) {
   
   if (s->tokens_amount >= s->tokens_size) {
     s->tokens_size *= 2;
-    s->tokens = realloc(s->tokens, s->tokens_size*sizeof(lextoken));
+    s->tokens = try(realloc(s->tokens, s->tokens_size*sizeof(lextoken)));
   }
 }
 
@@ -90,7 +90,7 @@ static void skip_until_newline(lexstate* s) {
 }
 
 static char* get_until_disallowed(lexstate* s, char endch) {
-  char* string = malloc(256);
+  char* string = try(malloc(256));
   size_t string_size = 256;
   
   size_t i = 0;
@@ -114,7 +114,7 @@ static char* get_until_disallowed(lexstate* s, char endch) {
     
     if (i >= string_size) {
       string_size *= 2;
-      string = realloc(string, string_size);
+      string = try(realloc(string, string_size));
     }
   }
   break_loop:
@@ -125,7 +125,7 @@ static char* get_until_disallowed(lexstate* s, char endch) {
 }
 
 static char* get_string(lexstate* s) {
-  char* string = malloc(256);
+  char* string = try(malloc(256));
   size_t string_size = 256;
   
   size_t i = 0;
@@ -163,7 +163,7 @@ static char* get_string(lexstate* s) {
     
     if (i >= string_size) {
       string_size *= 2;
-      string = realloc(string, string_size);
+      string = try(realloc(string, string_size));
     }
   }
   break_loop:

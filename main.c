@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "shared.h"
 #include "lexer.h"
 #include "parser.h"
 
@@ -10,17 +11,8 @@ void main(const int argc, const char* argv[]) {
     exit(1);
   }
   
-  FILE* file_in = fopen(argv[1], "rb");
-  if (!file_in) {
-    perror("hyperlisp");
-    exit(1);
-  }
-  
-  FILE* file_out = fopen(argv[2], "wb");
-  if (!file_out) {
-    perror("hyperlisp");
-    exit(1);
-  }
+  FILE* file_in = try(fopen(argv[1], "rb"));
+  FILE* file_out = try(fopen(argv[2], "wb"));
   
   lexstate lexs;
   
@@ -35,7 +27,7 @@ void main(const int argc, const char* argv[]) {
   lexs.counter_disabled = 0;
   lexs.tokens_amount = 0;
   lexs.tokens_size = 256;
-  lexs.tokens = malloc(256*sizeof(lextoken));
+  lexs.tokens = try(malloc(256*sizeof(lextoken)));
   
   lex(&lexs);
   
