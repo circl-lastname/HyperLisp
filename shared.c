@@ -47,11 +47,11 @@ void print_error_and_exit(FILE* file, const char* filename, long curline, long c
       break;
     }
     
-    putchar(ch);
+    fputc(ch, stderr);
     ch = fgetc(file);
   }
   break_loop_2:
-  putchar('\n');
+  fputc('\n', stderr);
   
   char* char_arrow = malloc(curchar+2);
   
