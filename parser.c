@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "error.h"
+#include "shared.h"
 #include "lexer.h"
 #include "parser.h"
 

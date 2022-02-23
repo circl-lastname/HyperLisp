@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "error.h"
+#include "shared.h"
 #include "lexer.h"
 
 static void error(lexstate* s, const char* string) {

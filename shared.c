@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// this is def code replication, but it works anywhere
+// this is is a mini-lexer, ripping out some code from it to iterate over the file
+// there may be a more libc-this way to do this
 void print_error_and_exit(FILE* file, const char* filename, long curline, long curchar, const char* string) {
   rewind(file);
   char ch = fgetc(file);
