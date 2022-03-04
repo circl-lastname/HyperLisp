@@ -208,15 +208,14 @@ static void recurse(lexstate* s, lextype endtype) {
         put_token(s, KEYWORD, keyword);
       break;
       case '\'':
+        set_token_cur(s);
         consume(s);
         
         if (s->ch == '(') {
-          set_token_cur(s);
           put_token(s, BEGIN_LIST, NULL);
           consume(s);
           recurse(s, END_LIST);
         } else {
-          set_token_cur(s);
           char* literal = get_until_disallowed(s);
           put_token(s, LITERAL, literal);
         }
