@@ -4,6 +4,7 @@
 #include "shared.h"
 #include "lexer.h"
 #include "parser.h"
+#include "print_tokens.h"
 
 void main(const int argc, const char* argv[]) {
   if (argc != 3) {
@@ -30,6 +31,10 @@ void main(const int argc, const char* argv[]) {
   lexs.tokens = try(malloc(256*sizeof(lextoken)));
   
   lex(&lexs);
+  
+  #ifdef PRINT_TOKENS
+    print_tokens(&lexs);
+  #endif
   
   prsstate prss;
   
