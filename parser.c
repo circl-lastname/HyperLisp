@@ -49,7 +49,11 @@ static void recurse(prsstate* s) {
   if (!strcmp(s->tk->data, "!nodoctype")) {
     if (!s->put_doctype) {
       s->put_doctype = 1;
+      
       consume(s);
+      if (s->tk->type != END_BLOCK) {
+        error(s, "Content and attributes are not allowed in a !nodoctype");
+      }
       return;
     } else {
       error(s, "A !nodoctype must be in the beggining of the file and cannot be called twice");
