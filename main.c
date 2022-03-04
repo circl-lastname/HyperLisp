@@ -4,7 +4,7 @@
 #include "shared.h"
 #include "lexer.h"
 #include "parser.h"
-#include "print_tokens.h"
+#include "debug.h"
 
 void main(const int argc, const char* argv[]) {
   if (argc != 3) {

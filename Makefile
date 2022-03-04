@@ -1,8 +1,8 @@
 all:
-	gcc -s -O2 shared.c lexer.c parser.c print_tokens.c main.c -o hyperlisp
+	gcc -s -O2 shared.c lexer.c parser.c debug.c main.c -o hyperlisp
 
 emscripten:
-	emcc -s WASM=0 -s ENVIRONMENT=web -O2 shared.c lexer.c parser.c print_tokens.c main.c -o hyperlisp.js
+	emcc -s WASM=0 -s ENVIRONMENT=web -O2 shared.c lexer.c parser.c debug.c main.c -o hyperlisp.js
 
 clean:
 	rm -f hyperlisp
