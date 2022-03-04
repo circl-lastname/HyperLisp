@@ -162,6 +162,9 @@ static char* get_string(lexstate* s) {
           case '\\':
             string[i] = '\\';
           break;
+          case 'n':
+            string[i] = '\n';
+          break;
           default:
             error(s, "Unknown escape character");
           break;
