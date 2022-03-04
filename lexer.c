@@ -89,18 +89,36 @@ static void skip_until_newline(lexstate* s) {
   consume(s);
 }
 
-static char* get_until_disallowed(lexstate* s, char endch) {
+static char* get_until_disallowed(lexstate* s) {
   char* string = try(malloc(256));
   size_t string_size = 256;
   
   size_t i = 0;
   while (1) {
-    if (isspace(s->ch) || s->ch == endch) {
+    if (isspace(s->ch)) {
       break;
     }
     
     switch (s->ch) {
       case ';':
+        goto break_loop;
+      break;
+      case '\'':
+        goto break_loop;
+      break;
+      case '"':
+        goto break_loop;
+      break;
+      case '(':
+        goto break_loop;
+      break;
+      case ')':
+        goto break_loop;
+      break;
+      case '[':
+        goto break_loop;
+      break;
+      case ']':
         goto break_loop;
       break;
       case EOF:
@@ -174,27 +192,20 @@ static char* get_string(lexstate* s) {
   return string;
 }
 
-static void recurse(lexstate* s, char endch, lextype endtype) {
+static void recurse(lexstate* s, lextype endtype) {
   while (1) {
     skip_space(s);
-    
-    if (s->ch == endch) {
-      set_token_cur(s);
-      put_token(s, endtype, NULL);
-      consume(s);
-      break;
-    }
     
     switch (s->ch) {
       case ';':
         skip_until_newline(s);
       break;
-      case '(':
+      case ':':
         set_token_cur(s);
-        put_token(s, BEGIN_BLOCK, NULL);
         consume(s);
         
-        recurse(s, ')', END_BLOCK);
+        char* keyword = get_until_disallowed(s);
+        put_token(s, KEYWORD, keyword);
       break;
       case '\'':
         consume(s);
@@ -203,26 +214,12 @@ static void recurse(lexstate* s, char endch, lextype endtype) {
           set_token_cur(s);
           put_token(s, BEGIN_LIST, NULL);
           consume(s);
-          recurse(s, ')', END_LIST);
+          recurse(s, END_LIST);
         } else {
           set_token_cur(s);
-          char* literal = get_until_disallowed(s, endch);
+          char* literal = get_until_disallowed(s);
           put_token(s, LITERAL, literal);
         }
-      break;
-      case '[':
-        set_token_cur(s);
-        put_token(s, BEGIN_VECTOR, NULL);
-        consume(s);
-        
-        recurse(s, ']', END_VECTOR);
-      break;
-      case ':':
-        set_token_cur(s);
-        consume(s);
-        
-        char* keyword = get_until_disallowed(s, endch);
-        put_token(s, KEYWORD, keyword);
       break;
       case '"':
         set_token_cur(s);
@@ -231,13 +228,46 @@ static void recurse(lexstate* s, char endch, lextype endtype) {
         char* string = get_string(s);
         put_token(s, STRING, string);
       break;
+      case '(':
+        set_token_cur(s);
+        put_token(s, BEGIN_BLOCK, NULL);
+        consume(s);
+        
+        recurse(s, END_BLOCK);
+      break;
+      case ')':
+        if (endtype != END_BLOCK && endtype != END_LIST) {
+          error(s, "Unexpected ')'");
+        }
+        
+        goto break_loop;
+      break;
+      case '[':
+        set_token_cur(s);
+        put_token(s, BEGIN_VECTOR, NULL);
+        consume(s);
+        
+        recurse(s, END_VECTOR);
+      break;
+      case ']':
+        if (endtype != END_VECTOR) {
+          error(s, "Unexpected ']'");
+        }
+        
+        goto break_loop;
+      break;
       default: { // some compilers (eg clang, older gcc) don't like having variables in default
         set_token_cur(s);
-        char* symbol = get_until_disallowed(s, endch);
+        char* symbol = get_until_disallowed(s);
         put_token(s, SYMBOL, symbol);
       } break;
     }
   }
+  break_loop:
+  
+  set_token_cur(s);
+  put_token(s, endtype, NULL);
+  consume(s);
 }
 
 void lex(lexstate* s) {
@@ -262,7 +292,7 @@ void lex(lexstate* s) {
         put_token(s, BEGIN_BLOCK, NULL);
         consume(s);
         
-        recurse(s, ')', END_BLOCK);
+        recurse(s, END_BLOCK);
       break;
       case EOF:
         goto break_loop;
