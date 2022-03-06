@@ -84,7 +84,7 @@ static void recurse(prsstate* s) {
     consume(s);
   }
   
-  fprintf(s->file, ">");
+  fputc('>', s->file);
   
   if (needs_closing(element)) {
     while (s->tk->type != END_BLOCK) {
