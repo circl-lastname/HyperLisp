@@ -3,8 +3,6 @@ The Lisp-to-HTML preprocessor
 
 `usage: hyperlisp <input> <output>`
 
-[Try it out online!](https://circl-lastname.github.io/HyperLisp-demo)
-
 Add this to your README to show off:
 
 ```
@@ -14,6 +12,8 @@ Add this to your README to show off:
 [![built with HyperLisp!](https://img.shields.io/badge/built%20with-HyperLisp!-blue)](https://github.com/circl-lastname/HyperLisp)
 
 ## Quick start guide
+[Try out the online demo!](https://circl-lastname.github.io/HyperLisp-demo)
+
 ```lisp
 ; A DOCTYPE is inserted autmatically, but if you don't want it you can use
 (!nodoctype)
