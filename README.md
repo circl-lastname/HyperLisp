@@ -11,6 +11,12 @@ Add this to your README to show off:
 
 [![built with HyperLisp!](https://img.shields.io/badge/built%20with-HyperLisp!-blue)](https://github.com/circl-lastname/HyperLisp)
 
+## Installation
+### Linux
+With make and gcc: `make && sudo make install`
+### Windows
+Executables are available in the [releases](https://github.com/circl-lastname/HyperLisp/releases).
+
 ## Quick start guide
 [Try out the online demo!](https://circl-lastname.github.io/HyperLisp-demo)
 
