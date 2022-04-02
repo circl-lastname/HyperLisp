@@ -1,13 +1,13 @@
+CC = gcc
+
 all:
-	gcc -s -O2 shared.c lexer.c parser.c debug.c main.c -o hyperlisp
+	$(CC) -s -O2 *.c -o hyperlisp
 
 emscripten:
-	emcc -s WASM=0 -s ENVIRONMENT=web -O2 shared.c lexer.c parser.c debug.c main.c -o hyperlisp.js
+	emcc -s WASM=0 -s ENVIRONMENT=web -O2 *.c -o hyperlisp.js
 
 clean:
-	rm -f hyperlisp
-	rm -f hyperlisp.js
-	rm -f hyperlisp.js.mem
+	rm -f hyperlisp hyperlisp.js hyperlisp.js.mem
 
 install:
 	cp hyperlisp /usr/local/bin
