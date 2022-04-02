@@ -1,3 +1,5 @@
+#include "wst.h"
+
 typedef struct {
   FILE* file;
   
@@ -7,6 +9,7 @@ typedef struct {
   lextoken* tk;
   long current_token;
   
+  wst_tree* elements;
   int put_doctype;
   
   long tokens_amount;

@@ -6,6 +6,18 @@
 #include "lexer.h"
 #include "parser.h"
 
+typedef enum {
+  NORMAL,
+  DOESNT_NEED_CLOSING,
+  SPECIAL_NODOCTYPE,
+} elementtype;
+
+elementtype element_types[] = {
+  NORMAL,
+  DOESNT_NEED_CLOSING,
+  SPECIAL_NODOCTYPE,
+};
+
 static void error(prsstate* s, const char* string) {
   print_error_and_exit(s->file_in, s->filename_in, s->tk->curline, s->tk->curchar, string);
 }
@@ -13,27 +25,6 @@ static void error(prsstate* s, const char* string) {
 static void consume(prsstate* s) {
   s->current_token++;
   s->tk = &s->tokens[s->current_token];
-}
-
-static int needs_closing(char* element) {
-  if (!strcmp(element, "area") ||
-      !strcmp(element, "base") ||
-      !strcmp(element, "br") ||
-      !strcmp(element, "col") ||
-      !strcmp(element, "embed") ||
-      !strcmp(element, "hr") ||
-      !strcmp(element, "img") ||
-      !strcmp(element, "input") ||
-      !strcmp(element, "link") ||
-      !strcmp(element, "meta") ||
-      !strcmp(element, "param") ||
-      !strcmp(element, "source") ||
-      !strcmp(element, "track") ||
-      !strcmp(element, "wbr")) {
-    return 0;
-  } else {
-    return 1;
-  }
 }
 
 static void recurse(prsstate* s) {
@@ -46,7 +37,14 @@ static void recurse(prsstate* s) {
     error(s, "A tag must be a symbol");
   }
   
-  if (!strcmp(s->tk->data, "!nodoctype")) {
+  char* element = s->tk->data;
+  elementtype* element_type = (elementtype*)wst_get(s->elements, s->tk->data);
+  
+  if (!element_type) {
+    element_type = &element_types[NORMAL];
+  }
+  
+  if (*element_type == SPECIAL_NODOCTYPE) {
     if (!s->put_doctype) {
       s->put_doctype = 1;
       
@@ -66,7 +64,6 @@ static void recurse(prsstate* s) {
   }
   
   fprintf(s->file, "<%s", s->tk->data);
-  char* element = s->tk->data;
   consume(s);
   
   while (s->tk->type == KEYWORD) {
@@ -86,7 +83,7 @@ static void recurse(prsstate* s) {
   
   fputc('>', s->file);
   
-  if (needs_closing(element)) {
+  if (*element_type != DOESNT_NEED_CLOSING) {
     while (s->tk->type != END_BLOCK) {
       switch (s->tk->type) {
         case BEGIN_BLOCK:
@@ -112,9 +109,29 @@ static void recurse(prsstate* s) {
   }
 }
 
-void parse(prsstate* s) {  
+void parse(prsstate* s) {
+  s->elements = wst_create();
+  wst_set(s->elements, "area",       &element_types[DOESNT_NEED_CLOSING]);
+  wst_set(s->elements, "base",       &element_types[DOESNT_NEED_CLOSING]);
+  wst_set(s->elements, "br",         &element_types[DOESNT_NEED_CLOSING]);
+  wst_set(s->elements, "col",        &element_types[DOESNT_NEED_CLOSING]);
+  wst_set(s->elements, "embed",      &element_types[DOESNT_NEED_CLOSING]);
+  wst_set(s->elements, "hr",         &element_types[DOESNT_NEED_CLOSING]);
+  wst_set(s->elements, "img",        &element_types[DOESNT_NEED_CLOSING]);
+  wst_set(s->elements, "input",      &element_types[DOESNT_NEED_CLOSING]);
+  wst_set(s->elements, "link",       &element_types[DOESNT_NEED_CLOSING]);
+  wst_set(s->elements, "meta",       &element_types[DOESNT_NEED_CLOSING]);
+  wst_set(s->elements, "param",      &element_types[DOESNT_NEED_CLOSING]);
+  wst_set(s->elements, "source",     &element_types[DOESNT_NEED_CLOSING]);
+  wst_set(s->elements, "track",      &element_types[DOESNT_NEED_CLOSING]);
+  wst_set(s->elements, "wbr",        &element_types[DOESNT_NEED_CLOSING]);
+  wst_set(s->elements, "wbr",        &element_types[DOESNT_NEED_CLOSING]);
+  wst_set(s->elements, "!nodoctype", &element_types[SPECIAL_NODOCTYPE]);
+  
   while (s->tk->type != END_TOKENS) {
     recurse(s);
     consume(s);
   }
+  
+  wst_free(s->elements);
 }
