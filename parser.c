@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -46,7 +47,12 @@ static void recurse(prsstate* s) {
     error(s, "A tag must be a symbol");
   }
   
-  if (!strcmp(s->tk->data, "!nodoctype")) {
+  char* element = s->tk->data;
+  for (size_t i = 0; i < strlen(element); i++) {
+    element[i] = tolower(element[i]);
+  }
+  
+  if (!strcmp(element, "!nodoctype")) {
     if (!s->put_doctype) {
       s->put_doctype = 1;
       
@@ -65,8 +71,7 @@ static void recurse(prsstate* s) {
     s->put_doctype = 1;
   }
   
-  fprintf(s->file, "<%s", s->tk->data);
-  char* element = s->tk->data;
+  fprintf(s->file, "<%s", element);
   consume(s);
   
   while (s->tk->type == KEYWORD) {
