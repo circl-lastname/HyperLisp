@@ -25,7 +25,7 @@ Enviornment variables:
   LDFLAGS
     Change linker flags (from -s)
 
-  BINDIR
+  DESTDIR
     Change directory to install to (from /usr/local/bin)
 EOF
 }
@@ -37,7 +37,7 @@ generate_ninja () {
   CC=${CC:-gcc}
   CFLAGS=${CFLAGS:-"-O2"}
   LDFLAGS=${LDFLAGS:-"-s"}
-  BINDIR=${BINDIR:-"/usr/local/bin"}
+  DESTDIR=${DESTDIR:-"/usr/local/bin"}
   dir=${dir:-build}
   target=${target:-hyperlisp}
   
@@ -73,8 +73,8 @@ EOF
   echo "build $target: ld $objects" >> build.ninja
   
 cat << EOF >> build.ninja
-build $BINDIR/$target: install $target
-build install: phony $BINDIR/$target
+build $DESTDIR/$target: install $target
+build install: phony $DESTDIR/$target
 default $target
 EOF
 }
