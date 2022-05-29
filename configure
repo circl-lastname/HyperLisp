@@ -1,0 +1,96 @@
+#!/bin/sh
+set -e
+
+usage () {
+cat << EOF
+$0 - Generate build.ninja
+
+Options:
+  $0 --help
+    Show this
+
+  $0
+    Configure normally
+
+  $0 --for-web
+    Configure with defaults for emscripten
+
+Enviornment variables:
+  CC
+    Change C compiler (from gcc)
+
+  CFLAGS
+    Change compiler flags (from -O2)
+
+  LDFLAGS
+    Change linker flags (from -s)
+
+  BINDIR
+    Change directory to install to (from /usr/local/bin)
+EOF
+}
+
+generate_ninja () {
+  rm -f build.ninja
+  touch build.ninja
+  
+  CC=${CC:-gcc}
+  CFLAGS=${CFLAGS:-"-O2"}
+  LDFLAGS=${LDFLAGS:-"-s"}
+  BINDIR=${BINDIR:-"/usr/local/bin"}
+  dir=${dir:-build}
+  target=${target:-hyperlisp}
+  
+cat << EOF >> build.ninja
+rule cc
+  command = $CC $CFLAGS -MD -MF \$out.d -c \$in -o \$out
+  depfile = \$out.d
+  description = CC \$out
+
+rule ld
+  command = $CC $LDFLAGS \$in -o \$out
+  description = LD \$out
+
+rule install
+  command = cp \$in \$out
+  description = INSTALL \$out
+
+EOF
+  
+  cd src
+  files=$(echo *.c)
+  cd ..
+  
+  objects=""
+  
+  for file in $files; do
+    object=$dir/$(echo "$file" | sed "s/\\.c$/.o/")
+    objects="$objects$object "
+    
+    echo "build $object: cc src/$file" >> build.ninja
+  done
+  
+  echo "build $target: ld $objects" >> build.ninja
+  
+cat << EOF >> build.ninja
+build $BINDIR/$target: install $target
+build install: phony $BINDIR/$target
+default $target
+EOF
+}
+
+if [ "$1" = "--help" ]; then
+  usage
+  exit
+elif [ -z "$1" ]; then
+  generate_ninja
+elif [ "$1" = "--for-web" ]; then
+  CC=emcc
+  LDFLAGS="-s WASM=0 -s ENVIRONMENT=web"
+  dir=build-emscripten
+  target=hyperlisp.js
+  generate_ninja
+else
+  usage
+  exit 1
+fi

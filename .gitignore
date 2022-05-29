@@ -1,5 +1,8 @@
+/build
+/build-emscripten
+/build.ninja
+/.ninja_log
 /hyperlisp
 /hyperlisp.js
-/hyperlisp.js.mem
 /test.lisp
 /test.html
