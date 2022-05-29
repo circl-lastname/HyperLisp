@@ -13,7 +13,13 @@ Add this to your README to show off:
 
 ## Installation
 ### Linux
-With make and gcc: `make && sudo make install`
+With `ninja` and `gcc` installed
+```
+./configure
+ninja
+sudo ninja install
+```
+See `./configure --help` for more info on compilation.
 ### Windows
 Executables are available in the [releases](https://github.com/circl-lastname/HyperLisp/releases).
 
