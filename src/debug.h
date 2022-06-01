@@ -1,3 +1,3 @@
-#ifdef PRINT_TOKENS
-  void print_tokens(lexstate* s);
+#ifdef DEBUG
+  void print_tokens(lex_state* s);
 #endif

@@ -1,44 +1,18 @@
-#ifdef PRINT_TOKENS
+#ifdef DEBUG
+  #include <stdbool.h>
   #include <stdio.h>
   
   #include "lexer.h"
   
-  void print_tokens(lexstate* s) {
+  void print_tokens(lex_state* s) {
     for (long i = 0; i < s->tokens_amount; i++) {
       switch (s->tokens[i].type) {
-        case BEGIN_BLOCK:
-          fputs("BEGIN_BLOCK", stdout);
-        break;
-        case END_BLOCK:
-          fputs("END_BLOCK", stdout);
-        break;
-        case BEGIN_LIST:
-          fputs("BEGIN_LIST", stdout);
-        break;
-        case END_LIST:
-          fputs("END_LIST", stdout);
-        break;
-        case BEGIN_VECTOR:
-          fputs("BEGIN_VECTOR", stdout);
-        break;
-        case END_VECTOR:
-          fputs("END_VECTOR", stdout);
-        break;
-        case SYMBOL:
-          fputs("SYMBOL", stdout);
-        break;
-        case KEYWORD:
-          fputs("KEYWORD", stdout);
-        break;
-        case LITERAL:
-          fputs("LITERAL", stdout);
-        break;
-        case STRING:
-          fputs("STRING", stdout);
-        break;
-        case END_TOKENS:
-          fputs("END_TOKENS", stdout);
-        break;
+        #define F(t) \
+          case t: \
+            fputs(#t, stdout); \
+          break;
+        ENUMERATE_TOKENS(F)
+        #undef F
       }
       
       if (s->tokens[i].data) {

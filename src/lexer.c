@@ -1,36 +1,37 @@
 #include <ctype.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "shared.h"
 #include "lexer.h"
 
-static void error(lexstate* s, const char* string) {
-  print_error_and_exit(s->file, s->filename, s->curline, s->curchar, string);
+static void error(lex_state* s, const char* string) {
+  print_error_and_exit(s->file, s->filename, s->cur_line, s->cur_char, string);
 }
 
-static void set_token_cur(lexstate* s) {
-  s->token_curline = s->curline;
-  s->token_curchar = s->curchar;
+static void set_token_cur(lex_state* s) {
+  s->token_cur_line = s->cur_line;
+  s->token_cur_char = s->cur_char;
 }
 
-static void put_token(lexstate* s, lextype type, char* data) {
-  lextoken* token = &s->tokens[s->tokens_amount];
+static void put_token(lex_state* s, lex_type type, char* data) {
+  lex_token* token = &s->tokens[s->tokens_amount];
   
   token->type = type;
   token->data = data;
-  token->curline = s->token_curline;
-  token->curchar = s->token_curchar;
+  token->cur_line = s->token_cur_line;
+  token->cur_char = s->token_cur_char;
   
   s->tokens_amount++;
   
   if (s->tokens_amount >= s->tokens_size) {
     s->tokens_size *= 2;
-    s->tokens = try(realloc(s->tokens, s->tokens_size*sizeof(lextoken)));
+    s->tokens = try(realloc(s->tokens, s->tokens_size*sizeof(lex_token)));
   }
 }
 
-static void consume(lexstate* s) {
+static void consume(lex_state* s) {
   s->ch = fgetc(s->file);
   
   // this is a big if block to run every character, but
@@ -40,33 +41,33 @@ static void consume(lexstate* s) {
   if (!s->counter_disabled) {
     if (s->after_newline) {
       if (s->ch != EOF) {
-        s->after_newline = 0;
-        s->curline++;
-        s->curchar = 0;
+        s->after_newline = false;
+        s->cur_line++;
+        s->cur_char = 0;
       }
     } else {
-      s->curchar++;
+      s->cur_char++;
     }
     
     switch (s->ch) {
       case '\n':
-        s->after_newline = 1;
+        s->after_newline = true;
       break;
       case EOF:
-        s->counter_disabled = 1;
+        s->counter_disabled = true;
       break;
     }
   }
 }
 
-static void skip_space(lexstate* s) {
+static void skip_space(lex_state* s) {
   while (isspace(s->ch)) {
     consume(s);
   }
 }
 
-static void skip_until_newline(lexstate* s) {
-  while (1) {
+static void skip_until_newline(lex_state* s) {
+  while (true) {
     switch (s->ch) {
       case '\n':
         goto break_loop;
@@ -89,12 +90,12 @@ static void skip_until_newline(lexstate* s) {
   consume(s);
 }
 
-static char* get_until_disallowed(lexstate* s) {
+static char* get_until_disallowed(lex_state* s) {
   char* string = try(malloc(256));
   size_t string_size = 256;
   
   size_t i = 0;
-  while (1) {
+  while (true) {
     if (isspace(s->ch)) {
       break;
     }
@@ -142,12 +143,12 @@ static char* get_until_disallowed(lexstate* s) {
   return string;
 }
 
-static char* get_string(lexstate* s) {
+static char* get_string(lex_state* s) {
   char* string = try(malloc(256));
   size_t string_size = 256;
   
   size_t i = 0;
-  while (1) {
+  while (true) {
     switch (s->ch) {
       case '"':
         goto break_loop;
@@ -195,8 +196,8 @@ static char* get_string(lexstate* s) {
   return string;
 }
 
-static void recurse(lexstate* s, lextype endtype) {
-  while (1) {
+static void recurse(lex_state* s, lex_type end_type) {
+  while (true) {
     skip_space(s);
     
     switch (s->ch) {
@@ -208,19 +209,19 @@ static void recurse(lexstate* s, lextype endtype) {
         consume(s);
         
         char* keyword = get_until_disallowed(s);
-        put_token(s, KEYWORD, keyword);
+        put_token(s, TOKEN_KEYWORD, keyword);
       break;
       case '\'':
         set_token_cur(s);
         consume(s);
         
         if (s->ch == '(') {
-          put_token(s, BEGIN_LIST, NULL);
+          put_token(s, TOKEN_LIST_BEGIN, NULL);
           consume(s);
-          recurse(s, END_LIST);
+          recurse(s, TOKEN_LIST_END);
         } else {
           char* literal = get_until_disallowed(s);
-          put_token(s, LITERAL, literal);
+          put_token(s, TOKEN_LITERAL, literal);
         }
       break;
       case '"':
@@ -228,17 +229,17 @@ static void recurse(lexstate* s, lextype endtype) {
         consume(s);
         
         char* string = get_string(s);
-        put_token(s, STRING, string);
+        put_token(s, TOKEN_STRING, string);
       break;
       case '(':
         set_token_cur(s);
-        put_token(s, BEGIN_BLOCK, NULL);
+        put_token(s, TOKEN_BLOCK_BEGIN, NULL);
         consume(s);
         
-        recurse(s, END_BLOCK);
+        recurse(s, TOKEN_BLOCK_END);
       break;
       case ')':
-        if (endtype != END_BLOCK && endtype != END_LIST) {
+        if (end_type != TOKEN_BLOCK_END && end_type != TOKEN_LIST_END) {
           error(s, "Unexpected ')'");
         }
         
@@ -246,13 +247,13 @@ static void recurse(lexstate* s, lextype endtype) {
       break;
       case '[':
         set_token_cur(s);
-        put_token(s, BEGIN_VECTOR, NULL);
+        put_token(s, TOKEN_VECTOR_BEGIN, NULL);
         consume(s);
         
-        recurse(s, END_VECTOR);
+        recurse(s, TOKEN_VECTOR_END);
       break;
       case ']':
-        if (endtype != END_VECTOR) {
+        if (end_type != TOKEN_VECTOR_END) {
           error(s, "Unexpected ']'");
         }
         
@@ -261,28 +262,28 @@ static void recurse(lexstate* s, lextype endtype) {
       default: { // some compilers (eg clang, older gcc) don't like having variables in default
         set_token_cur(s);
         char* symbol = get_until_disallowed(s);
-        put_token(s, SYMBOL, symbol);
+        put_token(s, TOKEN_SYMBOL, symbol);
       } break;
     }
   }
   break_loop:
   
   set_token_cur(s);
-  put_token(s, endtype, NULL);
+  put_token(s, end_type, NULL);
   consume(s);
 }
 
-void lex(lexstate* s) {
+void lex(lex_state* s) {
   switch (s->ch) {
     case '\n':
-      s->after_newline = 1;
+      s->after_newline = true;
     break;
     case EOF:
-      s->counter_disabled = 1;
+      s->counter_disabled = true;
     break;
   }
   
-  while (1) {
+  while (true) {
     skip_space(s);
     
     switch (s->ch) {
@@ -291,10 +292,10 @@ void lex(lexstate* s) {
       break;
       case '(':
         set_token_cur(s);
-        put_token(s, BEGIN_BLOCK, NULL);
+        put_token(s, TOKEN_BLOCK_BEGIN, NULL);
         consume(s);
         
-        recurse(s, END_BLOCK);
+        recurse(s, TOKEN_BLOCK_END);
       break;
       case EOF:
         goto break_loop;
@@ -307,5 +308,5 @@ void lex(lexstate* s) {
   break_loop:
   
   set_token_cur(s);
-  put_token(s, END_TOKENS, NULL);
+  put_token(s, TOKEN_EOF, NULL);
 }

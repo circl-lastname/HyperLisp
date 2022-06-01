@@ -4,13 +4,13 @@ typedef struct {
   FILE* file_in;
   const char* filename_in;
   
-  lextoken* tk;
+  lex_token* tk;
   long current_token;
   
-  int put_doctype;
+  bool put_doctype;
   
   long tokens_amount;
-  lextoken* tokens;
-} prsstate;
+  lex_token* tokens;
+} prs_state;
 
-void parse(prsstate* s);
+void parse(prs_state* s);

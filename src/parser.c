@@ -1,4 +1,5 @@
 #include <ctype.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,11 +8,11 @@
 #include "lexer.h"
 #include "parser.h"
 
-static void error(prsstate* s, const char* string) {
-  print_error_and_exit(s->file_in, s->filename_in, s->tk->curline, s->tk->curchar, string);
+static void error(prs_state* s, const char* string) {
+  print_error_and_exit(s->file_in, s->filename_in, s->tk->cur_line, s->tk->cur_char, string);
 }
 
-static void consume(prsstate* s) {
+static void consume(prs_state* s) {
   s->current_token++;
   s->tk = &s->tokens[s->current_token];
 }
@@ -37,13 +38,13 @@ static int needs_closing(char* element) {
   }
 }
 
-static void recurse(prsstate* s) {
-  if (s->tk->type != BEGIN_BLOCK) {
-    error(s, "Expected BEGIN_BLOCK");
+static void recurse(prs_state* s) {
+  if (s->tk->type != TOKEN_BLOCK_BEGIN) {
+    error(s, "Expected TOKEN_BLOCK_BEGIN");
   }
   consume(s);
   
-  if (s->tk->type != SYMBOL) {
+  if (s->tk->type != TOKEN_SYMBOL) {
     error(s, "A tag must be a symbol");
   }
   
@@ -54,10 +55,10 @@ static void recurse(prsstate* s) {
   
   if (!strcmp(element, "!nodoctype")) {
     if (!s->put_doctype) {
-      s->put_doctype = 1;
+      s->put_doctype = true;
       
       consume(s);
-      if (s->tk->type != END_BLOCK) {
+      if (s->tk->type != TOKEN_BLOCK_END) {
         error(s, "Content and attributes are not allowed in a !nodoctype");
       }
       return;
@@ -68,17 +69,17 @@ static void recurse(prsstate* s) {
   
   if (!s->put_doctype) {
     fputs("<!doctype html>", s->file);
-    s->put_doctype = 1;
+    s->put_doctype = true;
   }
   
   fprintf(s->file, "<%s", element);
   consume(s);
   
-  while (s->tk->type == KEYWORD) {
+  while (s->tk->type == TOKEN_KEYWORD) {
     fprintf(s->file, " %s", s->tk->data);
     consume(s);
     
-    if (!(s->tk->type == STRING || s->tk->type == LITERAL)) {
+    if (!(s->tk->type == TOKEN_STRING || s->tk->type == TOKEN_LITERAL)) {
       error(s, "An attribute must be a string or literal");
     }
     
@@ -92,13 +93,13 @@ static void recurse(prsstate* s) {
   fputc('>', s->file);
   
   if (needs_closing(element)) {
-    while (s->tk->type != END_BLOCK) {
+    while (s->tk->type != TOKEN_BLOCK_END) {
       switch (s->tk->type) {
-        case BEGIN_BLOCK:
+        case TOKEN_BLOCK_BEGIN:
           recurse(s);
         break;
-        case STRING:
-        case LITERAL:
+        case TOKEN_STRING:
+        case TOKEN_LITERAL:
           fputs(s->tk->data, s->file);
         break;
         default:
@@ -111,14 +112,14 @@ static void recurse(prsstate* s) {
     
     fprintf(s->file, "</%s>", element);
   } else {
-    if (s->tk->type != END_BLOCK) {
+    if (s->tk->type != TOKEN_BLOCK_END) {
       error(s, "Content is not allowed in void elements");
     }
   }
 }
 
-void parse(prsstate* s) {  
-  while (s->tk->type != END_TOKENS) {
+void parse(prs_state* s) {
+  while (s->tk->type != TOKEN_EOF) {
     recurse(s);
     consume(s);
   }
