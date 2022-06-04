@@ -13,7 +13,7 @@
   f(TOKEN_LITERAL) \
   f(TOKEN_STRING) \
   \
-  f(TOKEN_EOF) \
+  f(TOKEN_EOF)
 
 typedef enum {
   #define F(t) t,
